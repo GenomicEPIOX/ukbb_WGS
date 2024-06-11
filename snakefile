@@ -1,78 +1,93 @@
 import os
 import pandas as pd
 
-
+configfile: "config.yaml"
 #################
 
-cyto_file = config["cyto_file"]
-MAIN_PATH = config["main_path"]
-PLINK_PATH = config["plink_path"]
-RESULTS_PATH = config["results_path"]
-WGS_PATH = config["WGS_path"]
-MAC = config["MAC"]
-KEEP_FILE = config["keep_file"]
+cyto_file=config["cyto_file"]
+MAIN_PATH= config["main_path"]
+PLINK_PATH= config["plink_path"]
+RESULTS_PATH= config["results_path"]
+WGS_PATH= config["WGS_path"]
+CLEAN_UP= config["clean_up_script"]
 
-#clean_up_script = "/data/Epic/subprojects/Gwas/work/Plink_datasets/protein_subset/snakemake/cleanup.py"
+## plink parameters
+MAC= config["MAC"]
+KEEP_FILE= config["keep_file"]
+HWE= config["HWE"]
+MIND= config["MISSING_per_person"]
+GENO= config["MISSING_per_SNP"]
+MAX_ALLELE= config["MAX_alleles"]
+
 
 
 ############################################
 #Input functions
 
+df = pd.read_csv(cyto_file, sep="\t")
+
 def get_files(wildcards):
-    temp = cyto_file.loc[wildcards.gene_name, "files"]
-    temp2 = [x[:-7] for x in temp.split(", ")]
+    #print (wildcards)
+    ID = wildcards
+    #PATH = wildcards[0]
+    temp = df[df['ID'] == ID]["Files"].str.split(",",expand=True).transpose()
+    temp.columns = ["Files"]
+    temp["Files"] = temp.Files.str.strip()
+    temp["Files"] = temp["Files"].str.replace(r'.vcf.gz', '')
+    #temp["Files"] = PATH + "/" + ID + "/" + temp.Files + ".done"
+    temp = temp.Files
+    temp = temp.str.strip()
+    temp2 = temp.to_list()
+    print (temp2)
+   # temp2 = [x[:-7] for x in temp.split(", ")]
     return temp2
-
-def get_chromosome(wildcards): 
-    return cyto_file.loc[wildcards.gene_name, "CHR"]
-
-
+    #id_files = [item for sublist in temp2 for item in sublist]
+    #return id_files
+    #send_back =  [f"{PATH}{ID}/{file}.done" for file in id_files]
+    #print ("send_back")
+    #return send_back
 ############################################
 
 
 rule all:
     input:
-        expand("{RESULT_PATH}/{chromosome}/{cyto}.done", cyto=cyto),
-
-
+        expand("{PATH}{ID}/{ID}.done", ID=df["ID"], PATH=RESULTS_PATH),
+    
 rule create_plink_chunks:
     input:
-          "/mnt/project/{WGS_path}/chr{chromosome}/{WGS_FILE}.vcf.gz"
+          "chr1.extract.txt"
     resources:
-        mem='32G',
+        mem='1G',
         time='00:50:00',  
-        cpus=8
-    params:
-        CHR= lambda wildcards: get_chromosome(wildcards)
-        WGS_FILES= lambda wildcards: get_files(wildcards)
+        cpus=1
+    params: 
+        results = {RESULTS_PATH},
+        #files = lambda wildcards: get_files()
     output:
-        "{RESULT_PATH}/{cyto}/{file}.done"
+        "{PATH}/{ID}/{file}.done"
     shell:
         """
-        {PLINK_PATH} --vcf {INPUT}  {wildcards.Protein} --keep {KEEP_FILE} --mac {MAC} --max-alleles 3 --no-input-missing-phenotype --make-pgen --out {RESULT_PATH}/{wildcards.cyto}/{WGS_FILE}
-        metal /scratch/atkinsj/results/{wildcards.Protein}/{wildcards.sex}/chr{wildcards.chromosome}/{wildcards.Protein}.metal.sh > out.txt
-        python /scratch/atkinsj/by_sex/cleanup.py -w /scratch/atkinsj/results/{wildcards.Protein}/{wildcards.sex}/chr{wildcards.chromosome}/ -p {wildcards.Protein} > out.txt
-       ##touch /scratch/atkinsj/results/{wildcards.Protein}/chr{wildcards.chromosome}/{wildcards.cohort}_chr{wildcards.chromosome}.done 
+       touch "{wildcards.PATH}/{wildcards.ID}/{wildcards.file}.done"
 
        """
 
 rule merge_chunks:
     input:
-          "/scratch/atkinsj/results/{Protein}/{sex}/chr{chromosome}/"
+          #lambda wildcards: expand('{PATH}/{ID}/{file}.done', ID=wildcards.ID, PATH=wildcards.RESULT_PATH, file=(get_files(wildcards.ID)))
+         lambda wildcards: ["{wildcards.RESULT_PATH/{wildcards.ID}/{file}.done".format(file) for file in get_files(wildcards.ID) ]
+            
     resources:
-        mem='120G',
+        mem='1G',
         time='05:00:00',
         partition="high_p",  
-        cpus=8
+        cpus=1
     params:
-        CHR= lambda wildcards: get_chromosome(wildcards)
+       # files = lambda wildcards: get_files()
     output:
-        "/scratch/atkinsj/results/{Protein}/{sex}/chr{chromosome}/*tbl.gz"
+        "{RESULT_PATH}/{ID}/{ID}.done"
     shell:
-        """
-
-       
-       ##touch /scratch/atkinsj/results/{wildcards.Protein}/chr{wildcards.chromosome}/{wildcards.cohort}_chr{wildcards.chromosome}.done 
+        """ 
+       touch "{RESULT_PATH}{wildcards.ID}/{wildcards.ID}.done"
 
        """
 

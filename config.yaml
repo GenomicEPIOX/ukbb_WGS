@@ -1,0 +1,22 @@
+#### file that contains the columns ID,Files (tab sep)
+cyto_file: "/Users/joshuaa/Desktop/WGS_snakemake_RAP/chr1.extract.txt"
+#### the main folder where this snakemake will be ran from
+main_path: "/Users/joshuaa/Desktop/WGS_snakemake_RAP/"
+####Binary file for plink - linux 64-bit version (download from https://www.cog-genomics.org/plink/2.0/)
+plink_path: "/Users/joshuaa/miniconda3/condabin/plink2"
+#### the path to where the results will be generated - it will be one folder per an ID
+results_path: "/Users/joshuaa/Desktop/WGS_snakemake_RAP/results/"
+### the mounted path of where the DRAGEN VCF files are inside your docker container - make sure dnafuse is install correctly
+WGS_path: "/Users/joshuaa/Desktop/WGS_snakemake_RAP/"
+### the python clean up script to remove temp files
+clean_up_script: "/Users/joshuaa/Desktop/WGS_snakemake_RAP/clean_up.py"
+######
+###### PLINK SETTINGS
+### the keep file for the individuals that you want to keep in the analysis
+keep_file: "/Users/joshuaa/Desktop/WGS_snakemake_RAP/keep.txt"
+####MAC 
+MAC : '5'
+HWE : "5e-8"
+MAX_alleles: "3"
+MISSING_per_person : "0.1"
+MISSING_per_SNP : "0.1"
