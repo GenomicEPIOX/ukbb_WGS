@@ -4,7 +4,7 @@ import pandas as pd
 configfile: "config.yaml"
 #################
 
-cyto_file=config["cyto_file"]
+cyto_file= config["cyto_file"]
 MAIN_PATH= config["main_path"]
 PLINK_PATH= config["plink_path"]
 RESULTS_PATH= config["results_path"]
@@ -26,56 +26,53 @@ MAX_ALLELE= config["MAX_alleles"]
 
 df = pd.read_csv(cyto_file, sep="\t")
 
-def get_files(wildcards):
-    #print (wildcards)
-    ID = wildcards
-    #PATH = wildcards[0]
+def get_files(ID):
     temp = df[df['ID'] == ID]["Files"].str.split(",",expand=True).transpose()
     temp.columns = ["Files"]
     temp["Files"] = temp.Files.str.strip()
     temp["Files"] = temp["Files"].str.replace(r'.vcf.gz', '')
-    #temp["Files"] = PATH + "/" + ID + "/" + temp.Files + ".done"
     temp = temp.Files
     temp = temp.str.strip()
     temp2 = temp.to_list()
-    print (temp2)
-   # temp2 = [x[:-7] for x in temp.split(", ")]
     return temp2
-    #id_files = [item for sublist in temp2 for item in sublist]
-    #return id_files
-    #send_back =  [f"{PATH}{ID}/{file}.done" for file in id_files]
-    #print ("send_back")
-    #return send_back
 ############################################
 
+def get_chromosome(ID):
+    temp = df[df['ID'] == ID]["CHR"].unique()[0]
+    return temp
+
+
+
+file_list = get_files(config["ID"])
+ID = config["ID"] 
+CHROMOSOME = get_chromosome(ID)
 
 rule all:
     input:
-        expand("{PATH}{ID}/{ID}.done", ID=df["ID"], PATH=RESULTS_PATH),
-    
+        f"results/{ID}/{ID}.done"
+
+
 rule create_plink_chunks:
     input:
-          "chr1.extract.txt"
+          config["cyto_file"]
     resources:
-        mem='1G',
+        mem='6G',
         time='00:50:00',  
-        cpus=1
+        cpus=2
     params: 
-        results = {RESULTS_PATH},
-        #files = lambda wildcards: get_files()
+ 
     output:
-        "{PATH}/{ID}/{file}.done"
+         "results/{ID}/temp/{files}.done"
     shell:
         """
-       touch "{wildcards.PATH}/{wildcards.ID}/{wildcards.file}.done"
-
+       {PLINK_PATH} --memory 6000 --threads 2  --vcf {WGS_path}{CHROMSOME}/{wildcards.files}.vcf.gz --keep {KEEP_FILE} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-allele {MAX_ALLELE} --make-pgen --out results/{wildcards.ID}/temp/{wildcards.files}
+       echo "{wildcards.files}"  >> results/{wildcards.ID}/merge.list
+       touch "results/{wildcards.ID}/{wildcards.files}.done"
        """
 
 rule merge_chunks:
     input:
-          #lambda wildcards: expand('{PATH}/{ID}/{file}.done', ID=wildcards.ID, PATH=wildcards.RESULT_PATH, file=(get_files(wildcards.ID)))
-         lambda wildcards: ["{wildcards.RESULT_PATH/{wildcards.ID}/{file}.done".format(file) for file in get_files(wildcards.ID) ]
-            
+        expand("results/{ID}/temp/{files}.done", ID=config["ID"], files=file_list)
     resources:
         mem='1G',
         time='05:00:00',
@@ -84,10 +81,14 @@ rule merge_chunks:
     params:
        # files = lambda wildcards: get_files()
     output:
-        "{RESULT_PATH}/{ID}/{ID}.done"
+        "results/{ID}/{ID}.done"
     shell:
         """ 
-       touch "{RESULT_PATH}{wildcards.ID}/{wildcards.ID}.done"
-
+        {PLINK_PATH} --memory 12000 --threads 4  --pmerge-list results/{wildcards.ID}/merge.list --make-pgen --out results/{wildcards.ID}/{wildcards.ID}
+       touch "results/{wildcards.ID}/{wildcards.ID}.done"
+       rm -r results/{wildcards.ID}/temp/
+      
        """
+
+
 
