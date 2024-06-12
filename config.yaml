@@ -1,7 +1,7 @@
 ###### This is the path inside the docker container running SLURM !!!!!
 
 #### file that contains the columns ID,Files (tab sep)
-cyto_file: "/mnt/data/autosomal_files.txt"
+cyto_file: "/mnt/data/ukbb_WGS/autosomal_files.txt"
 
 ####Binary file for plink - linux 64-bit version (download from https://www.cog-genomics.org/plink/2.0/)
 plink_path: "/mnt/data/plink2"
