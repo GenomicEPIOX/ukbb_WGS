@@ -5,11 +5,8 @@ configfile: "config.yaml"
 #################
 
 cyto_file= config["cyto_file"]
-MAIN_PATH= config["main_path"]
 PLINK_PATH= config["plink_path"]
-RESULTS_PATH= config["results_path"]
-WGS_PATH= config["WGS_path"]
-CLEAN_UP= config["clean_up_script"]
+#WGS_PATH= config["WGS_path"]
 
 ## plink parameters
 MAC= config["MAC"]
@@ -37,17 +34,6 @@ def get_files(ID):
     return temp2
 ############################################
 
-def get_chromosome(ID):
-    temp = df[df['ID'] == ID]["CHR"].unique()[0]
-    return temp
-
-
-
-file_list = get_files(config["ID"])
-ID = config["ID"] 
-CHROMOSOME = get_chromosome(ID)
-
-rule all:
     input:
         f"results/{ID}/{ID}.done"
 
@@ -65,9 +51,9 @@ rule create_plink_chunks:
          "results/{ID}/temp/{files}.done"
     shell:
         """
-       {PLINK_PATH} --memory 6000 --threads 2  --vcf {WGS_path}{CHROMSOME}/{wildcards.files}.vcf.gz --keep {KEEP_FILE} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-allele {MAX_ALLELE} --make-pgen --out results/{wildcards.ID}/temp/{wildcards.files}
-       echo "{wildcards.files}"  >> results/{wildcards.ID}/merge.list
-       touch "results/{wildcards.ID}/{wildcards.files}.done"
+       {PLINK_PATH} --memory 6000 --threads 2  --vcf /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\ WGS/DRAGEN\ population\ level\ WGS\ variants\,\ pVCF\ format\ \[500k\ release\]/chr{CHROMOSOME}/{wildcards.files}.vcf.gz --keep {KEEP_FILE} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-alleles {MAX_ALLELE} --make-pgen --out results/{wildcards.ID}/temp/{wildcards.files}
+       echo "results/temp/{wildcards.files}"  >> results/{wildcards.ID}/merge.list
+       touch results/{ID}/{wildcards.files}.done
        """
 
 rule merge_chunks:
@@ -89,6 +75,3 @@ rule merge_chunks:
        rm -r results/{wildcards.ID}/temp/
       
        """
-
-
-

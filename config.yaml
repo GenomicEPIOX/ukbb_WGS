@@ -1,19 +1,16 @@
-###### This is the path inside the docker container running SLURM !!!!!
-
-#### file that contains the columns ID,Files (tab sep)
-cyto_file: "/mnt/data/ukbb_WGS/autosomal_files.txt"
-
-####Binary file for plink - linux 64-bit version (download from https://www.cog-genomics.org/plink/2.0/)
-plink_path: "/mnt/data/plink2"
-### the mounted path of where the DRAGEN VCF files are inside your docker container - make sure dnafuse is install correctly
-WGS_path: "/mnt/data/Bulk/DRAGEN\ WGS/DRAGEN\ population\ level\ WGS\ variants\,\ pVCF\ format\ \[500k\ release\]/chr"
-######
-###### PLINK SETTINGS
-### the keep file for the individuals that you want to keep in the analysis
-keep_file: "/mnt/data/keep.txt"
-####MAC 
-MAC : '5'
-HWE : "5e-8"
-MAX_alleles: "3"
-MISSING_per_person : "0.1"
-MISSING_per_SNP : "0.1"
+cyto_file:
+  "/mnt/data/ukbb_WGS/autosomal_files.txt"
+plink_path:
+  "/mnt/data/plink2"
+keep_file:
+  "/mnt/data/keep.txt"
+MAC:
+  '5'
+HWE:
+  "5e-8"
+MAX_alleles:
+  "3"
+MISSING_per_person:
+  "0.1"
+MISSING_per_SNP:
+  "0.1"
