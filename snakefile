@@ -20,8 +20,7 @@ rule create_plink_chunks:
          "results/{ID}/temp/{files}.done"
     shell:
         """
-        {PLINK_PATH} --memory 4000 --threads 2  --vcf /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\ WGS/DRAGEN\ population\ level\ WGS\ variants\,\ pVCF\ format\ \[500k\ release\]/chr{CHROMOSOME}/{wildcards.files}.vcf.gz --keep {KEEP_FILE} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-alleles {MAX_ALLELE} --make-pgen --out results/{wildcards.ID}/temp/{wildcards.files}
-       echo "results/{wildcards.ID}/temp/{wildcards.files}"  >> results/{wildcards.ID}/merge.list
+        python3 make_plink_chunk.py -f {wildcards.files} -i {wildcards.ID} -c {CHROMOSOME} -k {KEEP_FILE} -m {MAC} -hwe {HWE} -mind {MIND} -g {GENO} -max {MAX_ALLELE}
        touch {output}
        """
 

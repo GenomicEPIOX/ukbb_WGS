@@ -1,6 +1,0 @@
-__default__ :
-        ntasks: 1
-        cpus-per-task: "{threads}"
-        nodes: "1"
-        output: "slurm_logs/{rule}/{rule}.{wildcards}-%j.out"
-        error: "slurm_logs/{rule}/{rule}.{wildcards}-%j.err"
