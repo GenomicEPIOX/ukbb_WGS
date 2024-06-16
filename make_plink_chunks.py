@@ -27,9 +27,9 @@ def check_arg(args=None):
 
 
 def main(FILE , ID, CHROM , KEEP , MAC , HWE, MIND , GENO , MAX_ALLELES ):
-
-    command1 = f"plink2 --memory 4000 --threads 2  --vcf /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\ WGS/DRAGEN\ population\ level\ WGS\ variants\,\ pVCF\ format\ \[500k\ release\]/chr{CHROM}/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-alleles {MAX_ALLELES} --make-pgen --out results/{ID}/temp/{FILE}"
-    command2 = f"bcftools view --max-alleles {MAX_ALLELES} /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\ WGS/DRAGEN\ population\ level\ WGS\ variants\,\ pVCF\ format\ \[500k\ release\]/chr{CHROM}/{FILE}.vcf.gz -O z -o results/{ID}/temp/{FILE}.vcf.gz"
+    #### make sure you update this to your correct path -- eg replace ../WGS_UKBB/.. to your project name on DNAnexus
+    command1 = f"plink2 --memory 4000 --threads 2  --vcf /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\\ WGS/DRAGEN\\ population\\ level\\ WGS\\ variants\\,\\ pVCF\\ format\\ \\[500k\\ release\\]/chr{CHROM}/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-alleles {MAX_ALLELES} --make-pgen --out results/{ID}/temp/{FILE}"
+    command2 = f"bcftools view --max-alleles {MAX_ALLELES} /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\\ WGS/DRAGEN\\ population\\ level\\ WGS\\ variants\\,\\ pVCF\\ format\\ \\[500k\\ release\\]/chr{CHROM}/{FILE}.vcf.gz -O z -o results/{ID}/temp/{FILE}.vcf.gz"
     command3 = f"plink2 --memory 4000 --threads 2  --vcf results/{ID}/temp/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-alleles {MAX_ALLELES} --make-pgen --out results/{ID}/temp/{FILE}"
     command4 = f"echo {FILE} >> results/{ID}/temp/failed_ids.txt"
     merge_list_command = f"echo results/{ID}/temp/{FILE} >> results/{ID}/merge.list"
