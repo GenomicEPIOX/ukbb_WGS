@@ -50,7 +50,7 @@ rule create_plink_chunks:
           config["cyto_file"]
     resources:
         mem='4G',
-        time='00:50:00',  
+        time='10:00:00',  
         cpus=2
     params: 
  
@@ -66,16 +66,16 @@ rule merge_chunks:
     input:
         expand("results/{ID}/temp/{files}.done", ID=config["ID"], files=file_list)
     resources:
-        mem='100G',
-        time='05:00:00',  
-        cpus=16
+        mem='32G',
+        time='10:00:00',  
+        cpus=8
     params:
        # files = lambda wildcards: get_files()
     output:
         "results/{ID}/{ID}.done"
     shell:
         """ 
-        plink2 --memory 100000 --threads 16 --pmerge-list results/{wildcards.ID}/merge.list --make-pgen --out results/{wildcards.ID}/{wildcards.ID}
+        plink2 --memory 32000 --threads 8 --pmerge-list results/{wildcards.ID}/merge.list --make-pgen --out results/{wildcards.ID}/{wildcards.ID}
        touch "results/{wildcards.ID}/{wildcards.ID}.done"
         dx upload {wildcards.ID}.pvar --destination project-Gf0f5B0JKX1pJ1p9KzJ176bQ:plink_WGS/chr{CHROMOSOME}/
         dx upload {wildcards.ID}.psam --destination project-Gf0f5B0JKX1pJ1p9KzJ176bQ:plink_WGS/chr{CHROMOSOME}/
