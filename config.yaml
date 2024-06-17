@@ -1,7 +1,5 @@
 cyto_file:
   "/mnt/data/ukbb_WGS/autosomal_files.txt"
-plink_path:
-  "/mnt/data/plink2"
 keep_file:
   "/mnt/data/keep.txt"
 MAC:

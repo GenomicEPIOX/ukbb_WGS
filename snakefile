@@ -5,12 +5,6 @@ configfile: "config.yaml"
 #################
 
 cyto_file= config["cyto_file"]
-MAIN_PATH= config["main_path"]
-PLINK_PATH= config["plink_path"]
-RESULTS_PATH= config["results_path"]
-WGS_PATH= config["WGS_path"]
-CLEAN_UP= config["clean_up_script"]
-
 ## plink parameters
 MAC= config["MAC"]
 KEEP_FILE= config["keep_file"]
