@@ -58,7 +58,7 @@ rule create_plink_chunks:
          "results/{ID}/temp/{files}.done"
     shell:
         """
-        python3 make_plink_chunk.py -f {wildcards.files} -i {wildcards.ID} -c {CHROMOSOME} -k {KEEP_FILE} -m {MAC} -hwe {HWE} -mind {MIND} -g {GENO} -max {MAX_ALLELE}
+        python3 make_plink_chunks.py -f {wildcards.files} -i {wildcards.ID} -c {CHROMOSOME} -k {KEEP_FILE} -m {MAC} -hwe {HWE} -mind {MIND} -g {GENO} -max {MAX_ALLELE}
        touch {output}
        """
 
