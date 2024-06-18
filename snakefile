@@ -77,6 +77,10 @@ rule merge_chunks:
         """ 
         plink2 --memory 32000 --threads 8 --pmerge-list results/{wildcards.ID}/merge.list --make-pgen --out results/{wildcards.ID}/{wildcards.ID}
        touch "results/{wildcards.ID}/{wildcards.ID}.done"
+        dx upload {wildcards.ID}.pvar --destination project-Gf0f5B0JKX1pJ1p9KzJ176bQ:plink_WGS/chr{CHROMOSOME}/
+        dx upload {wildcards.ID}.psam --destination project-Gf0f5B0JKX1pJ1p9KzJ176bQ:plink_WGS/chr{CHROMOSOME}/
+        dx upload {wildcards.ID}.pgen --destination project-Gf0f5B0JKX1pJ1p9KzJ176bQ:plink_WGS/chr{CHROMOSOME}/
+        dx upload {wildcards.ID}.log --destination project-Gf0f5B0JKX1pJ1p9KzJ176bQ:plink_WGS/chr{CHROMOSOME}/
        rm -r results/{wildcards.ID}/temp/
       
        """
