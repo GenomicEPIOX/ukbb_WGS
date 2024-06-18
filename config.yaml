@@ -3,7 +3,7 @@ cyto_file:
 keep_file:
   "/mnt/data/keep.txt"
 MAC:
-  '5'
+  '1'
 HWE:
   "5e-8"
 MAX_alleles:
