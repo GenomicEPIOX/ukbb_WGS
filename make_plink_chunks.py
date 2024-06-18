@@ -1,5 +1,5 @@
 """
-makes plink chunks - if fail due to too many ALT, will run BCFTOOLS to remove them, if it fails again it drops that chunk!!!!!!
+makes plink chunks - Thank do Chris (PLINK guy) he released a version to skip the import of max alts!!!!!!
 """
 import pandas as pd 
 import numpy as np 
@@ -28,10 +28,8 @@ def check_arg(args=None):
 
 def main(FILE , ID, CHROM , KEEP , MAC , HWE, MIND , GENO , MAX_ALLELES ):
     #### make sure you update this to your correct path -- eg replace ../WGS_UKBB/.. to your project name on DNAnexus
-    command1 = f"plink2 --memory 4000 --threads 2  --vcf /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\\ WGS/DRAGEN\\ population\\ level\\ WGS\\ variants\\,\\ pVCF\\ format\\ \\[500k\\ release\\]/chr{CHROM}/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-alleles {MAX_ALLELES} --make-pgen --out results/{ID}/temp/{FILE}"
-    command2 = f"bcftools view --threads 2 --max-alleles {MAX_ALLELES} /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\\ WGS/DRAGEN\\ population\\ level\\ WGS\\ variants\\,\\ pVCF\\ format\\ \\[500k\\ release\\]/chr{CHROM}/{FILE}.vcf.gz -O z -o results/{ID}/temp/{FILE}.vcf.gz"
-    command3 = f"plink2 --memory 4000 --threads 2  --vcf results/{ID}/temp/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --max-alleles {MAX_ALLELES} --make-pgen --out results/{ID}/temp/{FILE}"
-    command4 = f"echo {FILE} >> results/{ID}/failed_ids.txt"
+    command1 = f"plink2 --memory 4000 --threads 2 --max-import-alleles {MAX_ALLELES} --vcf /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\\ WGS/DRAGEN\\ population\\ level\\ WGS\\ variants\\,\\ pVCF\\ format\\ \\[500k\\ release\\]/chr{CHROM}/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --hwe {HWE} --mind {MIND} --geno {GENO} --make-pgen --out results/{ID}/temp/{FILE}"
+    command4 = f"echo {FILE} >> results/{ID}/{ID}.failed_ids.txt"
     merge_list_command = f"echo results/{ID}/temp/{FILE} >> results/{ID}/merge.list"
 
     try:
@@ -39,23 +37,10 @@ def main(FILE , ID, CHROM , KEEP , MAC , HWE, MIND , GENO , MAX_ALLELES ):
         subprocess.check_call(command1, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
         subprocess.check_call(merge_list_command, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError as e:
-        print(f"An error occurred while executing plink, now trying BCFTOOLS: {e}")
-        try:
-            # If the first command fails, try running the second command
-            subprocess.check_call(command2, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
-            subprocess.check_call(command3, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
-            subprocess.check_call(merge_list_command, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
-        except subprocess.CalledProcessError as e:
-            print(f"An error occurred while trying to make chunk with plink and BCFTOOLS, writing to failed_chunks.txt: {e}")
-            try:
-                # If the second command fails, try running the third command
-                subprocess.check_call(command4, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
-            except subprocess.CalledProcessError as e:
-                print(f"An error occurred while trying to write to failed_ids.txt {e}")
-            except Exception as e:
-                print(f"yeah somethings wrong: {e}")
-        except Exception as e:
-            print(f"An unexpected error occurred while using BCFTOOLS/PLINK: {e}")
+        print(f"An error occurred while executing plink: {e}")
+
+        subprocess.check_call(command4, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
+
     except Exception as e:
         print(f"An unexpected error occurred while executing plink {e}")
     
