@@ -49,9 +49,9 @@ rule create_plink_chunks:
     input:
           config["cyto_file"]
     resources:
-        mem='4G',
+        mem='32G',
         time='10:00:00',  
-        cpus=2
+        cpus=8
     params: 
  
     output:
@@ -66,7 +66,7 @@ rule merge_chunks:
     input:
         expand("results/{ID}/temp/{files}.done", ID=config["ID"], files=file_list)
     resources:
-        mem='32G',
+        mem='64G',
         time='10:00:00',  
         cpus=8
     params:
