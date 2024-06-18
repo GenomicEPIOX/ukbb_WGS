@@ -29,7 +29,8 @@ def check_arg(args=None):
 def main(FILE , ID, CHROM , KEEP , MAC , HWE, MIND , GENO , MAX_ALLELES ):
     #### make sure you update this to your correct path -- eg replace ../WGS_UKBB/.. to your project name on DNAnexus
     command1 = f"plink2 --memory 4000 --threads 2 --import-max-alleles {MAX_ALLELES} --vcf /mnt/data/projects/WGS_UKBB/Bulk/DRAGEN\\ WGS/DRAGEN\\ population\\ level\\ WGS\\ variants\\,\\ pVCF\\ format\\ \\[500k\\ release\\]/chr{CHROM}/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --make-pgen --out results/{ID}/temp/{FILE}"
-    command4 = f"echo {FILE} >> results/{ID}/{ID}.failed_ids.txt"
+    command2 = f"echo {FILE} >> results/{ID}/{ID}.failed_ids.txt"
+    command3 = f"mv {FILE}.log >> results/{ID}/{ID}.failed_ids.txt"
     merge_list_command = f"echo results/{ID}/temp/{FILE} >> results/{ID}/merge.list"
 
     try:
@@ -39,8 +40,8 @@ def main(FILE , ID, CHROM , KEEP , MAC , HWE, MIND , GENO , MAX_ALLELES ):
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while executing plink: {e}")
 
-        subprocess.check_call(command4, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
-
+        subprocess.check_call(command2, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
+        subprocess.check_call(command3, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT, shell=True)
     except Exception as e:
         print(f"An unexpected error occurred while executing plink {e}")
     
