@@ -28,7 +28,7 @@ def check_arg(args=None):
 
 def main(FILE , ID, CHROM , KEEP , MAC , HWE, MIND , GENO , MAX_ALLELES ):
     #### make sure you update this to your correct path -- eg replace ../WGS_UKBB/.. to your project name on DNAnexus
-    command1 = f"plink2 --memory 32000 --threads 8  --import-max-alleles {MAX_ALLELES} --vcf projects/WGS_UKBB/Bulk/GATK\\ and\\ GraphTyper\\ WGS/GraphTyper\\ population\\ level\\ WGS\\ variants\\,\\ pVCF\\ format\\ \\[500k\\ release\\]/chr{CHROM}/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --make-pgen --out results/{ID}/temp/{FILE}"
+    command1 = f"plink2 --memory 32000 --threads 8  --import-max-alleles {MAX_ALLELES} --vcf /mnt/data/projects/WGS_UKBB/Bulk/GATK\\ and\\ GraphTyper\\ WGS/GraphTyper\\ population\\ level\\ WGS\\ variants\\,\\ pVCF\\ format\\ \\[500k\\ release\\]/chr{CHROM}/{FILE}.vcf.gz --keep {KEEP} --mac {MAC} --make-pgen --out results/{ID}/temp/{FILE}"
     command2 = f"echo {FILE} >> results/{ID}/{ID}.failed_ids.txt"
     command3 = f"mv {FILE}.log >> results/{ID}/{ID}.failed_ids.txt"
     merge_list_command = f"echo results/{ID}/temp/{FILE} >> results/{ID}/merge.list"
